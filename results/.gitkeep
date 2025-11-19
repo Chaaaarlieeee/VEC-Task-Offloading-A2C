@@ -1,0 +1,4 @@
+# This directory stores output results
+# - results/models/: Trained model checkpoints
+# - results/figures/: Performance visualization plots
+
