@@ -1,6 +1,6 @@
 """
-Environment Module  
-车联网边缘计算环境模块：强化学习环境实现
+Environment Module
+Vehicular Edge Computing Environment: Reinforcement Learning Environment Implementation
 """
 
 import numpy as np
@@ -8,25 +8,11 @@ from .task import TaskStatus
 
 
 class VehicularEdgeEnvironment:
-    """
-    车联网边缘计算环境类
-    实现强化学习环境接口
-    """
+
     
     def __init__(self, vehicle, rsus, task_generator, communication, 
                  simulation_time=None, time_slot=0.1, task_generation_prob=0.15):
-        """
-        初始化车联网边缘计算环境
-        
-        参数:
-            vehicle (Vehicle): 车辆对象
-            rsus (list): RSU对象列表
-            task_generator (TaskPoolGenerator): 任务生成器
-            communication (Communication): 通信对象
-            simulation_time (float, optional): 模拟总时间
-            time_slot (float): 时间槽大小，默认0.1秒
-            task_generation_prob (float): 每个时间槽生成新任务的概率，默认0.15
-        """
+
         self.vehicle = vehicle
         self.rsus = rsus
         self.task_generator = task_generator
@@ -431,14 +417,14 @@ class VehicularEdgeEnvironment:
 
 def find_nearest_rsu(vehicle_position, rsus):
     """
-    找到离车辆最近且在覆盖范围内的RSU
+    Find the nearest RSU within coverage range to the vehicle
     
-    参数:
-        vehicle_position (float): 车辆位置
-        rsus (list): RSU对象列表
+    Args:
+        vehicle_position (float): Vehicle position
+        rsus (list): List of RSU objects
         
-    返回:
-        int: 最近RSU的ID，如果没有在覆盖范围内的RSU则返回None
+    Returns:
+        int: ID of the nearest RSU, or None if no RSU is within coverage
     """
     in_range_rsus = [(rsu.rsu_id, abs(rsu.position - vehicle_position))
                     for rsu in rsus if rsu.is_vehicle_in_coverage(vehicle_position) and rsu.failure == 0]

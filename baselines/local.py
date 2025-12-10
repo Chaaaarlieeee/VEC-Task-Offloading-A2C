@@ -128,10 +128,7 @@ def run_local_baseline(vehicle=None, rsus=None, task_generator=None, communicati
     return final_results
 
 def analyze_task_failures(results):
-
-
-    plt.rcParams['font.sans-serif'] = ['SimHei']  
-    plt.rcParams['axes.unicode_minus'] = False    
+    """Analyze task failure reasons"""
     completed_tasks = results['completed_tasks']
     
   
@@ -154,10 +151,10 @@ def analyze_task_failures(results):
         print(f"{reason}: {count} tasks ({count/len(failed_tasks)*100:.2f}%)")
 
 def analyze_task_sizes(results):
-
+    """Analyze task sizes distribution"""
     completed_tasks = results['completed_tasks']
     
-
+    # Get task sizes in MB
     all_sizes = [task.size/1024/1024 for task in completed_tasks] 
     
 
@@ -175,63 +172,65 @@ def analyze_task_sizes(results):
     
 
     plt.figure(figsize=(10, 6))
-    plt.hist(all_sizes, bins=20, alpha=0.5, label='所有任务')
+    plt.hist(all_sizes, bins=20, alpha=0.5, label='All Tasks')
     if successful_sizes:
-        plt.hist(successful_sizes, bins=20, alpha=0.5, label='成功任务')
+        plt.hist(successful_sizes, bins=20, alpha=0.5, label='Successful Tasks')
     if failed_sizes:
-        plt.hist(failed_sizes, bins=20, alpha=0.5, label='失败任务')
+        plt.hist(failed_sizes, bins=20, alpha=0.5, label='Failed Tasks')
     
-    plt.xlabel('任务大小 (MB)')
-    plt.ylabel('任务数量')
-    plt.title('任务大小分布')
+    plt.xlabel('Task Size (MB)')
+    plt.ylabel('Number of Tasks')
+    plt.title('Task Size Distribution')
     plt.legend()
     plt.grid(True)
     plt.savefig('image/local_baseline_task_size_distribution.png', dpi=300)
 
 def plot_local_baseline_results(results):
-
+    """Plot local baseline results visualization"""
     history = results['history']
     
 
-    plt.rcParams['font.sans-serif'] = ['SimHei']  
-    plt.rcParams['axes.unicode_minus'] = False    
+    # Configure matplotlib for international fonts
+    plt.rcParams['axes.unicode_minus'] = False
     
-
     fig, axs = plt.subplots(2, 2, figsize=(14, 10))
     
-
-    axs[0, 0].plot(history['time'], history['total_tasks'], label='总任务数')
-    axs[0, 0].plot(history['time'], history['successful_tasks'], label='成功任务数')
-    axs[0, 0].plot(history['time'], history['failed_tasks'], label='失败任务数')
-    axs[0, 0].set_xlabel('时间 (秒)')
-    axs[0, 0].set_ylabel('任务数')
-    axs[0, 0].set_title('任务统计')
+    # Task statistics
+    axs[0, 0].plot(history['time'], history['total_tasks'], label='Total Tasks')
+    axs[0, 0].plot(history['time'], history['successful_tasks'], label='Successful Tasks')
+    axs[0, 0].plot(history['time'], history['failed_tasks'], label='Failed Tasks')
+    axs[0, 0].set_xlabel('Time (s)')
+    axs[0, 0].set_ylabel('Number of Tasks')
+    axs[0, 0].set_title('Task Statistics')
     axs[0, 0].legend()
     axs[0, 0].grid(True)
     
 
+    # Success rate
     axs[0, 1].plot(history['time'], [rate*100 for rate in history['success_rate']])
-    axs[0, 1].set_xlabel('时间 (秒)')
-    axs[0, 1].set_ylabel('成功率 (%)')
-    axs[0, 1].set_title('任务成功率')
+    axs[0, 1].set_xlabel('Time (s)')
+    axs[0, 1].set_ylabel('Success Rate (%)')
+    axs[0, 1].set_title('Task Success Rate')
     axs[0, 1].grid(True)
     
 
+    # Vehicle position
     axs[1, 0].plot(history['time'], history['vehicle_position'])
-    axs[1, 0].set_xlabel('时间 (秒)')
-    axs[1, 0].set_ylabel('位置 (米)')
-    axs[1, 0].set_title('车辆位置')
+    axs[1, 0].set_xlabel('Time (s)')
+    axs[1, 0].set_ylabel('Position (m)')
+    axs[1, 0].set_title('Vehicle Position')
     axs[1, 0].grid(True)
     
 
+    # Resource usage
     ax4 = axs[1, 1]
-    ax4.plot(history['time'], [cache/1024/1024 for cache in history['cache_available']], label='可用缓存 (MB)')
+    ax4.plot(history['time'], [cache/1024/1024 for cache in history['cache_available']], label='Available Cache (MB)')
     ax4_2 = ax4.twinx()
-    ax4_2.plot(history['time'], history['queue_length'], 'r-', label='队列长度')
-    ax4.set_xlabel('时间 (秒)')
-    ax4.set_ylabel('可用缓存 (MB)')
-    ax4_2.set_ylabel('队列长度')
-    ax4.set_title('资源使用情况')
+    ax4_2.plot(history['time'], history['queue_length'], 'r-', label='Queue Length')
+    ax4.set_xlabel('Time (s)')
+    ax4.set_ylabel('Available Cache (MB)')
+    ax4_2.set_ylabel('Queue Length')
+    ax4.set_title('Resource Usage')
     ax4.grid(True)
     
 
@@ -239,21 +238,20 @@ def plot_local_baseline_results(results):
     lines2, labels2 = ax4_2.get_legend_handles_labels()
     ax4.legend(lines1 + lines2, labels1 + labels2, loc='upper right')
     
-
     plt.tight_layout()
     plt.savefig('image/local_baseline_results.png', dpi=300)
     plt.show()
 
 if __name__ == "__main__":
-
-    print("===== 运行本地处理基线测试 =====")
+    # Run local processing baseline test
+    print("===== Running Local Processing Baseline Test =====")
     local_results = run_local_baseline(simulation_time=None, seed=42)
     
-
+    # Analyze task failures
     analyze_task_failures(local_results)
     
-
+    # Analyze task sizes
     analyze_task_sizes(local_results)
     
-
+    # Plot results
     plot_local_baseline_results(local_results) 

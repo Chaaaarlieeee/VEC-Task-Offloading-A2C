@@ -142,11 +142,7 @@ def run_random_baseline(vehicle=None, rsus=None, task_generator=None, communicat
     }
 
 def analyze_task_failures(results):
-
-    
-  
-    plt.rcParams['font.sans-serif'] = ['SimHei']  
-    plt.rcParams['axes.unicode_minus'] = False   
+    """Analyze task failure reasons"""
     completed_tasks = results['completed_tasks']
     
     
@@ -169,12 +165,7 @@ def analyze_task_failures(results):
         print(f"{reason}: {count} tasks ({count/len(failed_tasks)*100:.2f}%)")
 
 def analyze_task_sizes(results):
-
-    
-
-    plt.rcParams['font.sans-serif'] = ['SimHei']  
-    plt.rcParams['axes.unicode_minus'] = False   
-    
+    """Analyze task sizes distribution"""
     completed_tasks = results['completed_tasks']
     
  
@@ -195,86 +186,91 @@ def analyze_task_sizes(results):
     
  
     plt.figure(figsize=(10, 6))
-    plt.hist(all_sizes, bins=20, alpha=0.5, label='所有任务')
+    plt.hist(all_sizes, bins=20, alpha=0.5, label='All Tasks')
     if successful_sizes:
-        plt.hist(successful_sizes, bins=20, alpha=0.5, label='成功任务')
+        plt.hist(successful_sizes, bins=20, alpha=0.5, label='Successful Tasks')
     if failed_sizes:
-        plt.hist(failed_sizes, bins=20, alpha=0.5, label='失败任务')
+        plt.hist(failed_sizes, bins=20, alpha=0.5, label='Failed Tasks')
     
-    plt.xlabel('任务大小 (MB)')
-    plt.ylabel('任务数量')
-    plt.title('任务大小分布')
+    plt.xlabel('Task Size (MB)')
+    plt.ylabel('Number of Tasks')
+    plt.title('Task Size Distribution')
     plt.legend()
     plt.grid(True)
     plt.savefig('image/random_task_size_distribution.png', dpi=300)
 
 def plot_random_baseline_results(results):
-   
+    """Plot random baseline results visualization"""
     history = results['history']
     
-  
-    plt.rcParams['font.sans-serif'] = ['SimHei'] 
+    # Configure matplotlib for international fonts
     plt.rcParams['axes.unicode_minus'] = False    
 
     fig, axs = plt.subplots(2, 2, figsize=(14, 10))
     
- 
-    axs[0, 0].plot(history['time'], history['total_tasks'], label='总任务数')
-    axs[0, 0].plot(history['time'], history['successful_tasks'], label='成功任务数')
-    axs[0, 0].plot(history['time'], history['failed_tasks'], label='失败任务数')
-    axs[0, 0].set_xlabel('时间 (秒)')
-    axs[0, 0].set_ylabel('任务数量')
-    axs[0, 0].set_title('任务统计')
+    
+    # Task statistics
+    axs[0, 0].plot(history['time'], history['total_tasks'], label='Total Tasks')
+    axs[0, 0].plot(history['time'], history['successful_tasks'], label='Successful Tasks')
+    axs[0, 0].plot(history['time'], history['failed_tasks'], label='Failed Tasks')
+    axs[0, 0].set_xlabel('Time (s)')
+    axs[0, 0].set_ylabel('Number of Tasks')
+    axs[0, 0].set_title('Task Statistics')
     axs[0, 0].legend()
     axs[0, 0].grid(True)
     
-
+    
+    # Success rate
     axs[0, 1].plot(history['time'], [rate * 100 for rate in history['success_rate']])
-    axs[0, 1].set_xlabel('时间 (秒)')
-    axs[0, 1].set_ylabel('成功率 (%)')
-    axs[0, 1].set_title('任务成功率')
+    axs[0, 1].set_xlabel('Time (s)')
+    axs[0, 1].set_ylabel('Success Rate (%)')
+    axs[0, 1].set_title('Task Success Rate')
     axs[0, 1].grid(True)
     
- 
-    axs[1, 0].plot(history['time'], history['queue_length'], label='本地队列长度')
-    axs[1, 0].plot(history['time'], history['transmitting_tasks'], label='传输中任务数')
-    axs[1, 0].set_xlabel('时间 (秒)')
-    axs[1, 0].set_ylabel('任务数量')
-    axs[1, 0].set_title('队列长度和传输中任务')
+    
+    # Queue length and transmitting tasks
+    axs[1, 0].plot(history['time'], history['queue_length'], label='Local Queue Length')
+    axs[1, 0].plot(history['time'], history['transmitting_tasks'], label='Transmitting Tasks')
+    axs[1, 0].set_xlabel('Time (s)')
+    axs[1, 0].set_ylabel('Number of Tasks')
+    axs[1, 0].set_title('Queue Length and Transmitting Tasks')
     axs[1, 0].legend()
     axs[1, 0].grid(True)
     
-
+    
+    # Available cache
     axs[1, 1].plot(history['time'], [cache/1024/1024 for cache in history['cache_available']])
-    axs[1, 1].set_xlabel('时间 (秒)')
-    axs[1, 1].set_ylabel('可用缓存 (MB)')
-    axs[1, 1].set_title('车辆可用缓存')
+    axs[1, 1].set_xlabel('Time (s)')
+    axs[1, 1].set_ylabel('Available Cache (MB)')
+    axs[1, 1].set_title('Vehicle Available Cache')
     axs[1, 1].grid(True)
     
 
     plt.tight_layout()
     plt.savefig('image/random_baseline_results.png', dpi=300)
     
- 
+    
+    # Vehicle position over time
     plt.figure(figsize=(12, 6))
     plt.plot(history['time'], history['vehicle_position'])
-    plt.xlabel('时间 (秒)')
-    plt.ylabel('位置 (米)')
-    plt.title('车辆位置')
+    plt.xlabel('Time (s)')
+    plt.ylabel('Position (m)')
+    plt.title('Vehicle Position')
     plt.grid(True)
     plt.savefig('image/random_vehicle_position.png', dpi=300)
 
 if __name__ == "__main__":
-
-    print("===== 运行随机处理基线测试 =====")
+    # Run random strategy baseline test
+    print("===== Running Random Strategy Baseline Test =====")
     random_results = run_random_baseline(simulation_time=250, seed=42)
     
-
+    # Analyze task failures
     analyze_task_failures(random_results)
     
- 
+    # Analyze task sizes
     analyze_task_sizes(random_results)
- 
+    
+    # Plot results
     plot_random_baseline_results(random_results)
     
-    print("\n结果图表已保存到当前目录。")
+    print("\nResult charts have been saved to the current directory.")

@@ -7,6 +7,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 from environment import Vehicle, RSU, TaskPoolGenerator, Communication, VehicularEdgeEnvironment, TaskStatus
 
 def find_nearest_rsu(vehicle_position, rsus):
+    """Find the nearest RSU within coverage range"""
 
     in_range_rsus = [(rsu.rsu_id, abs(rsu.position - vehicle_position)) 
                     for rsu in rsus if rsu.is_vehicle_in_coverage(vehicle_position) and rsu.failure == 0]
@@ -20,11 +21,7 @@ def find_nearest_rsu(vehicle_position, rsus):
 
 
 def analyze_task_sizes(results):
-
-    
-
-    plt.rcParams['font.sans-serif'] = ['SimHei']  
-    plt.rcParams['axes.unicode_minus'] = False    
+    """Analyze task sizes distribution"""
     completed_tasks = results['completed_tasks']
     
 
@@ -44,15 +41,15 @@ def analyze_task_sizes(results):
     
 
     plt.figure(figsize=(10, 6))
-    plt.hist(all_sizes, bins=20, alpha=0.5, label='所有任务')
+    plt.hist(all_sizes, bins=20, alpha=0.5, label='All Tasks')
     if successful_sizes:
-        plt.hist(successful_sizes, bins=20, alpha=0.5, label='成功任务')
+        plt.hist(successful_sizes, bins=20, alpha=0.5, label='Successful Tasks')
     if failed_sizes:
-        plt.hist(failed_sizes, bins=20, alpha=0.5, label='失败任务')
+        plt.hist(failed_sizes, bins=20, alpha=0.5, label='Failed Tasks')
     
-    plt.xlabel('任务大小 (MB)')
-    plt.ylabel('任务数量')
-    plt.title('任务大小分布')
+    plt.xlabel('Task Size (MB)')
+    plt.ylabel('Number of Tasks')
+    plt.title('Task Size Distribution')
     plt.legend()
     plt.grid(True)
     plt.savefig('image/offload_baseline_task_size_distribution.png', dpi=300)
@@ -112,7 +109,7 @@ def run_offload_baseline(vehicle=None, rsus=None, task_generator=None, communica
     
 
     if verbose:
-        print("开始全部卸载基线测试...")
+        print("Starting full offloading baseline test...")
     
     while not env._check_terminal():
 
@@ -191,6 +188,7 @@ def run_offload_baseline(vehicle=None, rsus=None, task_generator=None, communica
     return final_results
 
 def analyze_task_failures(results):
+    """Analyze task failure reasons"""
 
     completed_tasks = results['completed_tasks']
     
@@ -214,45 +212,47 @@ def analyze_task_failures(results):
         print(f"{reason}: {count} tasks ({count/len(failed_tasks)*100:.2f}%)")
 
 def plot_offload_baseline_results(results):
-
+    """Plot offload baseline results visualization"""
     history = results['history']
     
-
-    plt.rcParams['font.sans-serif'] = ['SimHei'] 
+    # Configure matplotlib for international fonts
     plt.rcParams['axes.unicode_minus'] = False   
     
-  
+    
     fig, axs = plt.subplots(2, 2, figsize=(14, 10))
     
-
-    axs[0, 0].plot(history['time'], history['total_tasks'], label='总任务数')
-    axs[0, 0].plot(history['time'], history['successful_tasks'], label='成功任务数')
-    axs[0, 0].plot(history['time'], history['failed_tasks'], label='失败任务数')
-    axs[0, 0].set_xlabel('时间 (秒)')
-    axs[0, 0].set_ylabel('任务数')
-    axs[0, 0].set_title('任务统计')
+    # Task statistics
+    axs[0, 0].plot(history['time'], history['total_tasks'], label='Total Tasks')
+    axs[0, 0].plot(history['time'], history['successful_tasks'], label='Successful Tasks')
+    axs[0, 0].plot(history['time'], history['failed_tasks'], label='Failed Tasks')
+    axs[0, 0].set_xlabel('Time (s)')
+    axs[0, 0].set_ylabel('Number of Tasks')
+    axs[0, 0].set_title('Task Statistics')
     axs[0, 0].legend()
     axs[0, 0].grid(True)
     
-  
+    
+    # Success rate
     axs[0, 1].plot(history['time'], [rate*100 for rate in history['success_rate']])
-    axs[0, 1].set_xlabel('时间 (秒)')
-    axs[0, 1].set_ylabel('成功率 (%)')
-    axs[0, 1].set_title('任务成功率')
+    axs[0, 1].set_xlabel('Time (s)')
+    axs[0, 1].set_ylabel('Success Rate (%)')
+    axs[0, 1].set_title('Task Success Rate')
     axs[0, 1].grid(True)
     
-
+    
+    # Vehicle position
     axs[1, 0].plot(history['time'], history['vehicle_position'])
-    axs[1, 0].set_xlabel('时间 (秒)')
-    axs[1, 0].set_ylabel('位置 (米)')
-    axs[1, 0].set_title('车辆位置')
+    axs[1, 0].set_xlabel('Time (s)')
+    axs[1, 0].set_ylabel('Position (m)')
+    axs[1, 0].set_title('Vehicle Position')
     axs[1, 0].grid(True)
     
     
+    # Transmitting tasks
     axs[1, 1].plot(history['time'], history['transmitting_tasks'], 'g-')
-    axs[1, 1].set_xlabel('时间 (秒)')
-    axs[1, 1].set_ylabel('传输中任务数')
-    axs[1, 1].set_title('传输中任务数')
+    axs[1, 1].set_xlabel('Time (s)')
+    axs[1, 1].set_ylabel('Number of Transmitting Tasks')
+    axs[1, 1].set_title('Transmitting Tasks')
     axs[1, 1].grid(True)
     
   
@@ -261,13 +261,13 @@ def plot_offload_baseline_results(results):
     plt.show()
 
 if __name__ == "__main__":
-  
-    print("===== 运行全部卸载基线测试 =====")
+    # Run full offloading baseline test
+    print("===== Running Full Offloading Baseline Test =====")
     offload_results = run_offload_baseline(simulation_time= None, seed=None)
     
-
+    # Analyze results
     analyze_task_failures(offload_results)
     analyze_task_sizes(offload_results)
-
-   
+    
+    # Plot results
     plot_offload_baseline_results(offload_results) 
